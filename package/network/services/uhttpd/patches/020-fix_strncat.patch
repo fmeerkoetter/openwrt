@@ -1,0 +1,22 @@
+--- a/uhttpd-utils.c
++++ b/uhttpd-utils.c
+@@ -484,8 +484,8 @@ static char * canonpath(const char *path
+ 	if (*path != '/')
+ 	{
+ 		getcwd(path_copy, PATH_MAX);
+-		strncat(path_copy, "/", PATH_MAX - strlen(path_copy));
+-		strncat(path_copy, path, PATH_MAX - strlen(path_copy));
++		strncat(path_copy, "/", PATH_MAX - strlen(path_copy) - 1);
++		strncat(path_copy, path, PATH_MAX - strlen(path_copy) - 1);
+ 	}
+ 	else
+ 	{
+@@ -696,7 +696,7 @@ struct path_info * uh_path_lookup(struct
+ 			{
+ 				for (idx = uh_index_files; idx; idx = idx->next)
+ 				{
+-					strncat(buffer, idx->name, sizeof(buffer));
++					strncat(buffer, idx->name, sizeof(buffer) - strlen(buffer) - 1);
+ 
+ 					if (!stat(buffer, &s) && (s.st_mode & S_IFREG))
+ 					{
