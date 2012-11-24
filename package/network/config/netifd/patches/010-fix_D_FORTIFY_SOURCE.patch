@@ -1,0 +1,51 @@
+--- a/main.c
++++ b/main.c
+@@ -148,8 +148,12 @@ netifd_start_process(const char **argv,
+ 				env++;
+ 			}
+ 		}
+-		if (proc->dir_fd >= 0)
+-			fchdir(proc->dir_fd);
++		if (proc->dir_fd >= 0) {
++			if (fchdir(proc->dir_fd)) {
++				netifd_log_message(L_WARNING, "%s: %s\n",
++					__func__, strerror(errno));
++			}
++		}
+ 
+ 		dup2(pfds[1], 0);
+ 		dup2(pfds[1], 1);
+--- a/proto-shell.c
++++ b/proto-shell.c
+@@ -919,6 +919,7 @@ static void __init proto_shell_init(void
+ 		proto_shell_add_script(g.gl_pathv[i]);
+ 
+ close_cur:
+-	fchdir(main_fd);
++	if (fchdir(main_fd))
++		perror("fchdir() failed");
+ 	close(main_fd);
+ }
+--- a/system-linux.c
++++ b/system-linux.c
+@@ -148,7 +148,9 @@ static void system_set_sysctl(const char
+ 	if (fd < 0)
+ 		return;
+ 
+-	write(fd, val, strlen(val));
++	int strlen_val = strlen(val);
++	if ((write(fd, val, strlen_val) != strlen_val))
++		perror("system_set_sysctl");
+ 	close(fd);
+ }
+ 
+@@ -973,7 +975,8 @@ int system_flush_routes(void)
+ 		if (fd < 0)
+ 			continue;
+ 
+-		write(fd, "-1", 2);
++		if (write(fd, "-1", 2) != 2)
++			perror("system_flush_routes");
+ 		close(fd);
+ 	}
+ 	return 0;
