@@ -1,0 +1,12 @@
+--- a/uhttpd-utils.c
++++ b/uhttpd-utils.c
+@@ -483,7 +483,8 @@ static char * canonpath(const char *path
+ 	/* relative -> absolute */
+ 	if (*path != '/')
+ 	{
+-		getcwd(path_copy, PATH_MAX);
++		if (!getcwd(path_copy, PATH_MAX))
++			return NULL;
+ 		strncat(path_copy, "/", PATH_MAX - strlen(path_copy) - 1);
+ 		strncat(path_copy, path, PATH_MAX - strlen(path_copy) - 1);
+ 	}
