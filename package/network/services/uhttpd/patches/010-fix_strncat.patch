@@ -1,0 +1,20 @@
+--- a/uhttpd-file.c
++++ b/uhttpd-file.c
+@@ -290,7 +290,7 @@ static void uh_file_dirlist(struct clien
+ 		for (i = 0; i < count; i++)
+ 		{
+ 			strncat(filename, files[i]->d_name,
+-					sizeof(filename) - strlen(files[i]->d_name));
++					sizeof(filename) - strlen(files[i]->d_name) - 1);
+ 
+ 			if (!stat(filename, &s) &&
+ 				(s.st_mode & S_IFDIR) && (s.st_mode & S_IXOTH))
+@@ -313,7 +313,7 @@ static void uh_file_dirlist(struct clien
+ 		for (i = 0; i < count; i++)
+ 		{
+ 			strncat(filename, files[i]->d_name,
+-					sizeof(filename) - strlen(files[i]->d_name));
++					sizeof(filename) - strlen(files[i]->d_name) - 1);
+ 
+ 			if (!stat(filename, &s) &&
+ 				!(s.st_mode & S_IFDIR) && (s.st_mode & S_IROTH))
