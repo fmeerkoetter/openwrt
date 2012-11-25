@@ -1,0 +1,74 @@
+--- a/system-linux.c
++++ b/system-linux.c
+@@ -286,7 +286,7 @@ static int system_bridge_if(const char *
+ 		ifr.ifr_ifindex = dev->ifindex;
+ 	else
+ 		ifr.ifr_data = data;
+-	strncpy(ifr.ifr_name, bridge, sizeof(ifr.ifr_name));
++	strncpy(ifr.ifr_name, bridge, sizeof(ifr.ifr_name) - 1);
+ 	return ioctl(sock_ioctl, cmd, &ifr);
+ }
+ 
+@@ -347,7 +347,7 @@ int system_bridge_delif(struct device *b
+ static int system_if_resolve(struct device *dev)
+ {
+ 	struct ifreq ifr;
+-	strncpy(ifr.ifr_name, dev->ifname, sizeof(ifr.ifr_name));
++	strncpy(ifr.ifr_name, dev->ifname, sizeof(ifr.ifr_name) - 1);
+ 	if (!ioctl(sock_ioctl, SIOCGIFINDEX, &ifr))
+ 		return ifr.ifr_ifindex;
+ 	else
+@@ -359,7 +359,7 @@ static int system_if_flags(const char *i
+ 	struct ifreq ifr;
+ 
+ 	memset(&ifr, 0, sizeof(ifr));
+-	strncpy(ifr.ifr_name, ifname, sizeof(ifr.ifr_name));
++	strncpy(ifr.ifr_name, ifname, sizeof(ifr.ifr_name) - 1);
+ 	ioctl(sock_ioctl, SIOCGIFFLAGS, &ifr);
+ 	ifr.ifr_flags |= add;
+ 	ifr.ifr_flags &= ~rem;
+@@ -601,7 +601,7 @@ static int system_vlan(struct device *de
+ 		ifr.cmd = ADD_VLAN_CMD;
+ 		ifr.u.VID = id;
+ 	}
+-	strncpy(ifr.device1, dev->ifname, sizeof(ifr.device1));
++	strncpy(ifr.device1, dev->ifname, sizeof(ifr.device1) - 1);
+ 	return ioctl(sock_ioctl, SIOCSIFVLAN, &ifr);
+ }
+ 
+@@ -621,7 +621,7 @@ system_if_get_settings(struct device *de
+ 	struct ifreq ifr;
+ 
+ 	memset(&ifr, 0, sizeof(ifr));
+-	strncpy(ifr.ifr_name, dev->ifname, sizeof(ifr.ifr_name));
++	strncpy(ifr.ifr_name, dev->ifname, sizeof(ifr.ifr_name) - 1);
+ 
+ 	if (ioctl(sock_ioctl, SIOCGIFMTU, &ifr) == 0) {
+ 		s->mtu = ifr.ifr_mtu;
+@@ -645,7 +645,7 @@ system_if_apply_settings(struct device *
+ 	struct ifreq ifr;
+ 
+ 	memset(&ifr, 0, sizeof(ifr));
+-	strncpy(ifr.ifr_name, dev->ifname, sizeof(ifr.ifr_name));
++	strncpy(ifr.ifr_name, dev->ifname, sizeof(ifr.ifr_name) - 1);
+ 	if (s->flags & DEV_OPT_MTU) {
+ 		ifr.ifr_mtu = s->mtu;
+ 		if (ioctl(sock_ioctl, SIOCSIFMTU, &ifr) < 0)
+@@ -1013,7 +1013,7 @@ static int tunnel_ioctl(const char *name
+ 	struct ifreq ifr;
+ 
+ 	memset(&ifr, 0, sizeof(ifr));
+-	strncpy(ifr.ifr_name, name, sizeof(ifr.ifr_name));
++	strncpy(ifr.ifr_name, name, sizeof(ifr.ifr_name) - 1);
+ 	ifr.ifr_ifru.ifru_data = p;
+ 	return ioctl(sock_ioctl, cmd, &ifr);
+ }
+@@ -1076,7 +1076,7 @@ int system_add_ip_tunnel(const char *nam
+ 		p.iph.ttl = val;
+ 	}
+ 
+-	strncpy(p.name, name, sizeof(p.name));
++	strncpy(p.name, name, sizeof(p.name) - 1);
+ 	if (tunnel_ioctl(base, SIOCADDTUNNEL, &p) < 0)
+ 		return -1;
+ 
